@@ -1,0 +1,6 @@
+{
+  "version": "3.1.0",
+  "dataFile": "catalog_data.json",
+  "updated": "2026-09-01",
+  "description": "Исправлена проблема с изображениями - теперь SVG в формате data URI"
+}
