@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B Каталог — Всё-Полотна.рф</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-main: #f5f5f5;
+            --bg-sidebar: #1a1a2e;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #666;
+            --text-light: #ffffff;
+            --accent: #e94560;
+            --accent-hover: #c73e54;
+            --border: #e0e0e0;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-light);
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--accent);
+        }
+        .sidebar .subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .sidebar .version-info {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 15px;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+        .sidebar .version-info span { color: var(--accent); font-weight: 600; }
+
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .loading .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #333;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-box {
+            background: rgba(233,69,96,0.15);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #ff8a9e;
+        }
+
+        /* Categories */
+        .cat-list { list-style: none; margin-bottom: 20px; }
+        .cat-list li {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+        }
+        .cat-list li:hover { background: rgba(255,255,255,0.08); }
+        .cat-list li.active { background: var(--accent); color: #fff; font-weight: 600; }
+        .cat-list li .count {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .cat-list li.active .count { background: rgba(255,255,255,0.3); }
+
+        /* Brands */
+        .brand-select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        .brand-select option { background: #1a1a2e; }
+
+        /* Price filter */
+        .price-filter { margin-bottom: 15px; }
+        .price-filter label { font-size: 12px; color: #888; display: block; margin-bottom: 5px; }
+        .price-inputs { display: flex; gap: 8px; }
+        .price-inputs input {
+            width: 50%;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 13px;
+        }
+
+        /* B2C toggle */
+        .b2c-toggle {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .b2c-toggle .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .b2c-toggle label { font-size: 13px; }
+        .toggle-switch {
+            width: 40px; height: 22px;
+            background: #333;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle-switch.on { background: var(--success); }
+        .toggle-switch::after {
+            content: '';
+            width: 18px; height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px; left: 2px;
+            transition: left 0.3s;
+        }
+        .toggle-switch.on::after { left: 20px; }
+        .markup-slider {
+            width: 100%;
+            margin-top: 8px;
+        }
+        .markup-slider input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+        .markup-value { font-size: 12px; color: var(--accent); text-align: center; margin-top: 4px; }
+
+        /* === MAIN CONTENT === */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+        .stats-bar {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .stats-bar strong { color: var(--accent); }
+
+        /* Product grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .product-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .product-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .product-card .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+            flex: 1;
+            margin-right: 8px;
+        }
+        .product-card .card-code {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .product-card .card-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .product-card .card-meta span {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .product-card .card-prices {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .product-card .price-tag {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .product-card .price-harpoon {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .product-card .price-retail {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success);
+        }
+        .product-card .card-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .product-card .card-link:hover { text-decoration: underline; }
+        .product-card .add-to-estimate {
+            margin-top: 10px;
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-card .add-to-estimate:hover { background: var(--accent-hover); }
+
+        /* Estimate panel */
+        .estimate-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100vh;
+            background: #fff;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: right 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .estimate-panel.open { right: 0; }
+        .estimate-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .estimate-header h2 { font-size: 16px; }
+        .estimate-close {
+            width: 30px; height: 30px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .estimate-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .estimate-room {
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .estimate-room-header {
+            padding: 10px 15px;
+            background: #f8f8f8;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .estimate-room-body { padding: 10px 15px; }
+        .estimate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .estimate-item:last-child { border-bottom: none; }
+        .estimate-item .remove-item {
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .estimate-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            background: #f8f8f8;
+        }
+        .estimate-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .estimate-total .total-value { color: var(--accent); }
+        .estimate-actions { display: flex; gap: 8px; }
+        .estimate-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-export { background: var(--success); color: #fff; }
+        .btn-clear { background: #f0f0f0; color: var(--text-primary); }
+        .btn-add-room {
+            width: 100%;
+            padding: 8px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Cart badge */
+        .cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px; height: 56px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            background: var(--success);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 15px 0;
+        }
+        .pagination button {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .pagination button:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination .page-info { font-size: 13px; color: var(--text-secondary); }
+
+        /* Mobile */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px; left: 15px;
+            z-index: 150;
+            width: 40px; height: 40px;
+            background: var(--bg-sidebar);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
+            .product-grid { grid-template-columns: 1fr; }
+            .estimate-panel { width: 100%; right: -100%; }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
+        .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <h1>🏠 B2B Каталог</h1>
+        <p class="subtitle">Всё-Полотна.рф — дилерские цены</p>
+        <div class="version-info" id="versionInfo">Загрузка данных...</div>
+
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p>Загружаем каталог...</p>
+            <p style="font-size:11px; margin-top:8px;">Получаем реальные цены и названия</p>
+        </div>
+
+        <div id="errorBox" class="error-box" style="display:none;"></div>
+
+        <div id="sidebarContent" style="display:none;">
+            <h3 style="font-size:13px; color:#888; margin-bottom:8px;">КАТЕГОРИИ</h3>
+            <ul class="cat-list" id="catList"></ul>
+
+            <h3 style="font-size:13px; color:#888; margin-bottom:8px;">БРЕНД</h3>
+            <select class="brand-select" id="brandSelect">
+                <option value="">Все бренды</option>
+            </select>
+
+            <div class="price-filter">
+                <label>ЦЕНА НА ОТРЕЗ (₽/м²)</label>
+                <div class="price-inputs">
+                    <input type="number" id="priceMin" placeholder="от">
+                    <input type="number" id="priceMax" placeholder="до">
+                </div>
+            </div>
+
+            <div class="b2c-toggle">
+                <div class="toggle-row">
+                    <label>Розничная наценка</label>
+                    <div class="toggle-switch" id="b2cToggle" onclick="toggleB2C()"></div>
+                </div>
+                <div class="markup-slider" id="markupSlider" style="display:none;">
+                    <input type="range" min="10" max="100" value="40" id="markupRange" oninput="updateMarkup()">
+                    <div class="markup-value" id="markupValue">+40%</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="top-bar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск по названию, артикулу, бренду...">
+            </div>
+            <div class="stats-bar" id="statsBar">Загрузка...</div>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+        <div class="pagination" id="pagination"></div>
+    </main>
+
+    <!-- ESTIMATE PANEL -->
+    <div class="estimate-panel" id="estimatePanel">
+        <div class="estimate-header">
+            <h2>📋 Смета</h2>
+            <button class="estimate-close" onclick="toggleEstimate()">✕</button>
+        </div>
+        <div class="estimate-body" id="estimateBody">
+            <div class="empty-state">
+                <div class="icon">📝</div>
+                <h3>Смета пуста</h3>
+                <p>Добавьте товары из каталога</p>
+            </div>
+        </div>
+        <div class="estimate-footer">
+            <div class="estimate-total">
+                <span>Итого:</span>
+                <span class="total-value" id="totalValue">0 ₽</span>
+            </div>
+            <div class="estimate-actions">
+                <button class="btn-export" onclick="exportCSV()">📥 CSV</button>
+                <button class="btn-clear" onclick="clearEstimate()">🗑 Очистить</button>
+            </div>
+            <button class="btn-add-room" onclick="addRoom()">+ Добавить комнату</button>
+        </div>
+    </div>
+
+    <!-- CART BUTTON -->
+    <button class="cart-btn" onclick="toggleEstimate()">
+        🛒
+        <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
+    </button>
+
+    <script>
+    // ============================================
+    // ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+    // ============================================
+    let products = [];
+    let filteredProducts = [];
+    let config = {};
+    let state = {
+        category: 'Все',
+        brand: '',
+        priceMin: null,
+        priceMax: null,
+        search: '',
+        b2c: false,
+        markup: 40,
+        page: 1,
+        perPage: 48,
+        estimate: { rooms: [{ name: 'Комната 1', items: [] }] }
+    };
+
+    // ============================================
+    // ЗАГРУЗКА ДАННЫХ ИЗ JSON (КЛЮЧЕВАЯ ФУНКЦИЯ!)
+    // ============================================
+    async function loadCatalog() {
+        try {
+            // 1. Загружаем конфиг для версионирования (сброс кэша)
+            try {
+                const configResp = await fetch('catalog_config.json?t=' + Date.now());
+                if (configResp.ok) {
+                    config = await configResp.json();
+                }
+            } catch(e) {
+                config = { version: '1.0', dataFile: 'catalog_data.json' };
+            }
+
+            const dataFile = config.dataFile || 'catalog_data.json';
+            const version = config.version || '1.0';
+
+            // 2. Загружаем реальные данные из JSON
+            const resp = await fetch(dataFile + '?v=' + version + '&t=' + Date.now());
+            if (!resp.ok) throw new Error('Не удалось загрузить ' + dataFile + ' (HTTP ' + resp.status + ')');
+
+            products = await resp.json();
+
+            if (!Array.isArray(products) || products.length === 0) {
+                throw new Error('Файл ' + dataFile + ' пуст или имеет неверный формат');
+            }
+
+            // 3. Обновляем UI
+            document.getElementById('versionInfo').innerHTML =
+                'Версия данных: <span>' + version + '</span><br>Товаров: <span>' + products.length + '</span>';
+
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('sidebarContent').style.display = 'block';
+
+            // 4. Инициализируем фильтры и рендерим
+            initFilters();
+            applyFilters();
+
+        } catch (err) {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            const errorBox = document.getElementById('errorBox');
+            errorBox.style.display = 'block';
+            errorBox.innerHTML = '<strong>⚠️ Ошибка загрузки каталога</strong><br><br>' +
+                err.message + '<br><br>' +
+                '<strong>Что делать:</strong><br>' +
+                '1. Убедитесь, что файл <code>catalog_data.json</code> загружен в ту же папку, что и <code>index.html</code><br>' +
+                '2. Убедитесь, что файл <code>catalog_config.json</code> присутствует<br>' +
+                '3. Нажмите Ctrl+F5 для сброса кэша браузера';
+        }
+    }
+
+    // ============================================
+    // ФИЛЬТРЫ
+    // ============================================
+    function initFilters() {
+        // Категории
+        const catCounts = {};
+        products.forEach(p => {
+            catCounts[p.category] = (catCounts[p.category] || 0) + 1;
+        });
+
+        const catList = document.getElementById('catList');
+        catList.innerHTML = '';
+
+        // "Все"
+        const liAll = document.createElement('li');
+        liAll.className = 'active';
+        liAll.innerHTML = '<span>Все</span><span class="count">' + products.length + '</span>';
+        liAll.onclick = () => selectCategory('Все', liAll);
+        catList.appendChild(liAll);
+
+        Object.keys(catCounts).sort().forEach(cat => {
+            const li = document.createElement('li');
+            li.innerHTML = '<span>' + cat + '</span><span class="count">' + catCounts[cat] + '</span>';
+            li.onclick = () => selectCategory(cat, li);
+            catList.appendChild(li);
+        });
+
+        // Бренды
+        const brands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
+        const brandSelect = document.getElementById('brandSelect');
+        brands.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b;
+            opt.textContent = b;
+            brandSelect.appendChild(opt);
+        });
+    }
+
+    function selectCategory(cat, el) {
+        state.category = cat;
+        state.page = 1;
+        document.querySelectorAll('.cat-list li').forEach(li => li.classList.remove('active'));
+        el.classList.add('active');
+        applyFilters();
+    }
+
+    function applyFilters() {
+        filteredProducts = products.filter(p => {
+            if (state.category !== 'Все' && p.category !== state.category) return false;
+            if (state.brand && p.brand !== state.brand) return false;
+            if (state.priceMin !== null && p.price_cut < state.priceMin) return false;
+            if (state.priceMax !== null && p.price_cut > state.priceMax) return false;
+            if (state.search) {
+                const s = state.search.toLowerCase();
+                const text = (p.name + ' ' + p.code + ' ' + p.brand + ' ' + (p.color || '')).toLowerCase();
+                if (!text.includes(s)) return false;
+            }
+            return true;
+        });
+
+        renderProducts();
+        renderPagination();
+        updateStats();
+    }
+
+    // ============================================
+    // РЕНДЕР ТОВАРОВ
+    // ============================================
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        const start = (state.page - 1) * state.perPage;
+        const end = start + state.perPage;
+        const pageProducts = filteredProducts.slice(start, end);
+
+        if (pageProducts.length === 0) {
+            grid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>Ничего не найдено</h3><p>Попробуйте изменить фильтры</p></div>';
+            return;
+        }
+
+        grid.innerHTML = pageProducts.map(p => {
+            const priceCut = p.price_cut;
+            const priceHarpoon = p.price_harpoon;
+            let retailHtml = '';
+            if (state.b2c) {
+                const retailPrice = Math.round(priceCut * (1 + state.markup / 100));
+                retailHtml = '<span class="price-retail">Розн: ' + retailPrice.toLocaleString('ru-RU') + ' ₽</span>';
+            }
+
+            const metaParts = [];
+            if (p.width) metaParts.push('<span>📐 ' + p.width + '</span>');
+            if (p.texture) metaParts.push('<span>✨ ' + p.texture + '</span>');
+            if (p.color) metaParts.push('<span>🎨 ' + p.color + '</span>');
+
+            return '<div class="product-card">' +
+                '<div class="card-header">' +
+                    '<div class="card-title">' + escapeHtml(p.name) + '</div>' +
+                    '<div class="card-code">' + escapeHtml(p.code || '') + '</div>' +
+                '</div>' +
+                '<div class="card-meta">' + metaParts.join('') + '</div>' +
+                '<div class="card-prices">' +
+                    '<span class="price-tag">' + priceCut.toLocaleString('ru-RU') + ' ₽/м²</span>' +
+                    (priceHarpoon && priceHarpoon !== '—' ? '<span class="price-harpoon">гарпун: ' + Number(priceHarpoon).toLocaleString('ru-RU') + ' ₽</span>' : '') +
+                '</div>' +
+                (retailHtml ? '<div style="margin-top:4px;">' + retailHtml + '</div>' : '') +
+                (p.link ? '<a class="card-link" href="' + p.link + '" target="_blank" rel="noopener">↗ На сайте поставщика</a>' : '') +
+                '<button class="add-to-estimate" onclick="addToEstimate(' + p.id + ')">+ В смету</button>' +
+            '</div>';
+        }).join('');
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ============================================
+    // ПАГИНАЦИЯ
+    // ============================================
+    function renderPagination() {
+        const totalPages = Math.ceil(filteredProducts.length / state.perPage);
+        const pag = document.getElementById('pagination');
+        if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+        let html = '';
+        html += '<button ' + (state.page <= 1 ? 'disabled' : '') + ' onclick="goPage(' + (state.page - 1) + ')">←</button>';
+
+        const maxVisible = 7;
+        let startP = Math.max(1, state.page - 3);
+        let endP = Math.min(totalPages, startP + maxVisible - 1);
+        if (endP - startP < maxVisible - 1) startP = Math.max(1, endP - maxVisible + 1);
+
+        if (startP > 1) html += '<button onclick="goPage(1)">1</button><span>...</span>';
+        for (let i = startP; i <= endP; i++) {
+            html += '<button class="' + (i === state.page ? 'active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+        }
+        if (endP < totalPages) html += '<span>...</span><button onclick="goPage(' + totalPages + ')">' + totalPages + '</button>';
+
+        html += '<button ' + (state.page >= totalPages ? 'disabled' : '') + ' onclick="goPage(' + (state.page + 1) + ')">→</button>';
+        html += '<span class="page-info">Стр. ' + state.page + ' из ' + totalPages + '</span>';
+        pag.innerHTML = html;
+    }
+
+    function goPage(n) {
+        state.page = n;
+        renderProducts();
+        renderPagination();
+        window.scrollTo(0, 0);
+    }
+
+    function updateStats() {
+        document.getElementById('statsBar').innerHTML =
+            'Показано <strong>' + filteredProducts.length + '</strong> из <strong>' + products.length + '</strong> товаров';
+    }
+
+    // ============================================
+    // СМЕТА
+    // ============================================
+    function addToEstimate(productId) {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        const room = state.estimate.rooms[state.estimate.rooms.length - 1];
+        room.items.push({
+            id: product.id,
+            name: product.name,
+            code: product.code,
+            price: product.price_cut,
+            category: product.category
+        });
+
+        updateEstimateUI();
+    }
+
+    function updateEstimateUI() {
+        const body = document.getElementById('estimateBody');
+        const totalItems = state.estimate.rooms.reduce((s, r) => s + r.items.length, 0);
+
+        // Badge
+        const badge = document.getElementById('cartBadge');
+        if (totalItems > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = totalItems;
+        } else {
+            badge.style.display = 'none';
+        }
+
+        // Body
+        if (totalItems === 0) {
+            body.innerHTML = '<div class="empty-state"><div class="icon">📝</div><h3>Смета пуста</h3><p>Добавьте товары из каталога</p></div>';
+            document.getElementById('totalValue').textContent = '0 ₽';
+            return;
+        }
+
+        let total = 0;
+        body.innerHTML = state.estimate.rooms.map((room, ri) => {
+            if (room.items.length === 0) return '';
+            const roomTotal = room.items.reduce((s, item) => s + item.price, 0);
+            total += roomTotal;
+            return '<div class="estimate-room">' +
+                '<div class="estimate-room-header">' +
+                    '<span>' + escapeHtml(room.name) + ' (' + room.items.length + ')</span>' +
+                    '<span style="color:var(--accent);font-size:13px;">' + roomTotal.toLocaleString('ru-RU') + ' ₽</span>' +
+                '</div>' +
+                '<div class="estimate-room-body">' +
+                    room.items.map((item, ii) =>
+                        '<div class="estimate-item">' +
+                            '<span>' + escapeHtml(item.name) + '<br><small style="color:#999;">' + item.price.toLocaleString('ru-RU') + ' ₽</small></span>' +
+                            '<span class="remove-item" onclick="removeItem(' + ri + ',' + ii + ')">✕</span>' +
+                        '</div>'
+                    ).join('') +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        document.getElementById('totalValue').textContent = total.toLocaleString('ru-RU') + ' ₽';
+    }
+
+    function removeItem(roomIndex, itemIndex) {
+        state.estimate.rooms[roomIndex].items.splice(itemIndex, 1);
+        updateEstimateUI();
+    }
+
+    function addRoom() {
+        const name = prompt('Название комнаты:');
+        if (name) {
+            state.estimate.rooms.push({ name: name, items: [] });
+        }
+    }
+
+    function clearEstimate() {
+        if (confirm('Очистить всю смету?')) {
+            state.estimate = { rooms: [{ name: 'Комната 1', items: [] }] };
+            updateEstimateUI();
+        }
+    }
+
+    function toggleEstimate() {
+        document.getElementById('estimatePanel').classList.toggle('open');
+    }
+
+    function exportCSV() {
+        let csv = 'Комната;Товар;Артикул;Категория;Цена (₽)\n';
+        state.estimate.rooms.forEach(room => {
+            room.items.forEach(item => {
+                csv += room.name + ';' + item.name + ';' + item.code + ';' + item.category + ';' + item.price + '\n';
+            });
+        });
+
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'smeta_' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // ============================================
+    // B2C НАЦЕНКА
+    // ============================================
+    function toggleB2C() {
+        state.b2c = !state.b2c;
+        document.getElementById('b2cToggle').classList.toggle('on', state.b2c);
+        document.getElementById('markupSlider').style.display = state.b2c ? 'block' : 'none';
+        renderProducts();
+    }
+
+    function updateMarkup() {
+        state.markup = parseInt(document.getElementById('markupRange').value);
+        document.getElementById('markupValue').textContent = '+' + state.markup + '%';
+        renderProducts();
+    }
+
+    // ============================================
+    // ОБРАБОТЧИКИ СОБЫТИЙ
+    // ============================================
+    document.getElementById('searchInput').addEventListener('input', function() {
+        state.search = this.value.trim();
+        state.page = 1;
+        applyFilters();
+    });
+
+    document.getElementById('brandSelect').addEventListener('change', function() {
+        state.brand = this.value;
+        state.page = 1;
+        applyFilters();
+    });
+
+    document.getElementById('priceMin').addEventListener('input', function() {
+        state.priceMin = this.value ? parseInt(this.value) : null;
+        state.page = 1;
+        applyFilters();
+    });
+
+    document.getElementById('priceMax').addEventListener('input', function() {
+        state.priceMax = this.value ? parseInt(this.value) : null;
+        state.page = 1;
+        applyFilters();
+    });
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // ============================================
+    // СТАРТ
+    // ============================================
+    loadCatalog();
+    </script>
+</body>
+</html>
