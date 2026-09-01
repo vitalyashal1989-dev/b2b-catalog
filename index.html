@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B2B Каталог — Всё-Полотна.рф | Профессиональный каталог</title>
+    <title>B2B Каталог — Всё-Полотна.рф | Профессиональный инструмент</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -56,6 +56,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
 
         .logo-icon {
@@ -258,7 +259,7 @@
         /* Brand Grid */
         .brand-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -272,12 +273,27 @@
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .brand-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary);
             box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-image-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            transition: opacity 0.3s;
+        }
+
+        .brand-card:hover .brand-image-bg {
+            opacity: 0.25;
         }
 
         .brand-icon {
@@ -293,17 +309,23 @@
             font-weight: 700;
             color: white;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 2;
         }
 
         .brand-name {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
         }
 
         .brand-count {
             font-size: 13px;
             color: var(--text-secondary);
+            position: relative;
+            z-index: 2;
         }
 
         /* Product Grid */
@@ -320,6 +342,8 @@
             border-radius: 16px;
             overflow: hidden;
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
@@ -331,17 +355,30 @@
         .product-image {
             width: 100%;
             height: 200px;
-            object-fit: cover;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
 
         .product-info {
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .product-header {
@@ -349,6 +386,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
+            gap: 10px;
         }
 
         .product-title {
@@ -356,7 +394,7 @@
             font-weight: 600;
             line-height: 1.4;
             flex: 1;
-            margin-right: 10px;
+            color: var(--text-primary);
         }
 
         .product-code {
@@ -366,6 +404,7 @@
             font-size: 11px;
             font-weight: 600;
             white-space: nowrap;
+            color: var(--text-secondary);
         }
 
         .product-meta {
@@ -387,6 +426,7 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            margin-top: auto;
             margin-bottom: 15px;
         }
 
@@ -400,8 +440,11 @@
         }
 
         .price-harpoon {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         .product-actions {
@@ -411,7 +454,7 @@
 
         .btn-add {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
             border-radius: 10px;
@@ -419,6 +462,10 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-add:hover {
@@ -427,7 +474,7 @@
         }
 
         .btn-link {
-            padding: 10px 15px;
+            padding: 12px 15px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid var(--card-border);
             border-radius: 10px;
@@ -435,11 +482,170 @@
             text-decoration: none;
             font-size: 13px;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-link:hover {
             background: rgba(255, 255, 255, 0.15);
         }
+
+        /* Estimate Side Panel */
+        .estimate-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 420px;
+            height: 100vh;
+            background: var(--bg-dark);
+            border-left: 1px solid var(--card-border);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+
+        .estimate-panel.open {
+            right: 0;
+        }
+
+        .estimate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+
+        .estimate-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .btn-close-estimate {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .btn-close-estimate:hover {
+            color: var(--accent);
+        }
+
+        .estimate-items-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .estimate-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+
+        .estimate-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .estimate-item-details {
+            flex: 1;
+        }
+
+        .estimate-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .estimate-item-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .btn-remove-item {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .btn-remove-item:hover {
+            transform: scale(1.1);
+        }
+
+        .estimate-footer {
+            border-top: 1px solid var(--card-border);
+            padding-top: 20px;
+        }
+
+        .estimate-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .estimate-summary-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .estimate-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-export {
+            padding: 12px;
+            background: linear-gradient(135deg, var(--success), #00c6ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-clear {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-export:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4); }
+        .btn-clear:hover { background: rgba(255, 255, 255, 0.15); }
 
         /* Empty State */
         .empty-state {
@@ -484,6 +690,17 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 990;
+            display: none;
+        }
+        .overlay.open { display: block; }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .container {
@@ -512,14 +729,21 @@
             .product-grid {
                 grid-template-columns: 1fr;
             }
+
+            .estimate-panel {
+                width: 100%;
+                right: -100%;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <div class="logo">
+            <div class="logo" onclick="resetNavigation()">
                 <div class="logo-icon">🏠</div>
                 <div class="logo-text">
                     <h1>B2B Каталог</h1>
@@ -568,12 +792,33 @@
         </main>
     </div>
 
+    <!-- Estimate side panel -->
+    <div class="estimate-panel" id="estimatePanel">
+        <div class="estimate-header">
+            <h2>📋 Ваша смета</h2>
+            <button class="btn-close-estimate" onclick="toggleCart()">✕</button>
+        </div>
+        <div class="estimate-items-container" id="estimateItems">
+            <!-- Items will be loaded here dynamically -->
+        </div>
+        <div class="estimate-footer">
+            <div class="estimate-summary-row">
+                <span>Итого:</span>
+                <span class="estimate-summary-price" id="totalPrice">0 ₽</span>
+            </div>
+            <div class="estimate-actions">
+                <button class="btn-export" onclick="exportEstimate()">Экспорт CSV</button>
+                <button class="btn-clear" onclick="clearEstimate()">Очистить</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global state
         let products = [];
         let state = {
             currentCategory: null,
-            currentBrand: null,
+            currentSubgroup: null, // Может быть либо брендом, либо подкатегорией (типом товара)
             cart: []
         };
 
@@ -617,10 +862,68 @@
                 `).join('');
         }
 
+        // Helper to perform smart grouping/subcategories based on user criteria
+        function getSubgroupsForCategory(category) {
+            const filtered = products.filter(p => p.category === category);
+
+            if (["Полотна", "Профили", "Освещение", "Инструменты", "Услуги и гарпун"].includes(category)) {
+                // Группируем по брендам (например: MSD Premium, EuroKraab, SWG)
+                const brands = {};
+                filtered.forEach(p => {
+                    const b = p.brand || "Без бренда";
+                    brands[b] = (brands[b] || 0) + 1;
+                });
+                return Object.entries(brands).map(([name, count]) => ({
+                    type: 'brand',
+                    name: name,
+                    count: count,
+                    image: filtered.find(p => p.brand === name)?.image || ''
+                }));
+            } else {
+                // Группируем по типам товаров (подкатегориям)
+                const groups = {};
+                filtered.forEach(p => {
+                    let groupName = "Другое";
+                    const nameLower = p.name.toLowerCase();
+
+                    if (category === "Комплектующие") {
+                        if (nameLower.includes("платформа")) groupName = "Платформы под светильники";
+                        else if (nameLower.includes("кольцо") || nameLower.includes("термокольцо")) groupName = "Термокольца";
+                        else if (nameLower.includes("обход")) groupName = "Обходы труб";
+                        else if (nameLower.includes("решетка") || nameLower.includes("диффузор")) groupName = "Вентиляция";
+                        else groupName = "Монтажные элементы";
+                    } else if (category === "Расходные материалы") {
+                        if (nameLower.includes("клей") || nameLower.includes("cosmofen")) groupName = "Клей и герметики";
+                        else if (nameLower.includes("скотч") || nameLower.includes("лента")) groupName = "Ленты и скотч";
+                        else if (nameLower.includes("шнур")) groupName = "Демпферные шнуры";
+                        else if (nameLower.includes("гарпун")) groupName = "Гарпун";
+                        else groupName = "Расходники";
+                    } else if (category === "Крепеж") {
+                        if (nameLower.includes("саморез")) groupName = "Саморезы";
+                        else if (nameLower.includes("дюбель")) groupName = "Дюбели";
+                        else if (nameLower.includes("анкер")) groupName = "Анкеры";
+                        else groupName = "Крепежные элементы";
+                    } else if (category === "Декоративные заглушки") {
+                        if (nameLower.includes("вставка") || nameLower.includes("заглушка")) groupName = "Вставки декоративные";
+                        else groupName = "Заглушки";
+                    }
+
+                    groups[groupName] = (groups[groupName] || 0) + 1;
+                });
+
+                return Object.entries(groups).map(([name, count]) => ({
+                    type: 'subcat',
+                    name: name,
+                    count: count,
+                    image: filtered.find(p => p.name.toLowerCase().includes(name.split(' ')[0].toLowerCase()))?.image || ''
+                }));
+            }
+        }
+
         // Select category
         function selectCategory(category) {
             state.currentCategory = category;
-            state.currentBrand = null;
+            state.currentSubgroup = null;
 
             // Update active state
             document.querySelectorAll('.category-item').forEach(item => {
@@ -634,21 +937,42 @@
             updateBreadcrumbs();
         }
 
-        // Show brands for current category
+        // Show brands/subgroups for current category
         function showBrands() {
-            const filtered = state.currentCategory 
-                ? products.filter(p => p.category === state.currentCategory)
-                : products;
-
-            const brands = {};
-            filtered.forEach(p => {
-                const brand = p.brand;
-                brands[brand] = (brands[brand] || 0) + 1;
-            });
-
             const content = document.getElementById('contentArea');
 
-            if (Object.keys(brands).length === 0) {
+            if (!state.currentCategory) {
+                // Если категория не выбрана, показываем все бренды проекта
+                const brands = {};
+                products.forEach(p => {
+                    brands[p.brand] = (brands[p.brand] || 0) + 1;
+                });
+
+                content.innerHTML = `
+                    <div style="margin-bottom: 25px; font-size: 18px; font-weight: 600;">Популярные бренды каталога</div>
+                    <div class="brand-grid">
+                        ${Object.entries(brands)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 12)
+                            .map(([brand, count]) => {
+                                const sampleProd = products.find(p => p.brand === brand);
+                                return `
+                                    <div class="brand-card" onclick="selectQuickBrand('${brand}')">
+                                        <div class="brand-image-bg" style="background-image: url('${sampleProd?.image || ''}')"></div>
+                                        <div class="brand-icon">${brand.charAt(0)}</div>
+                                        <div class="brand-name">${brand}</div>
+                                        <div class="brand-count">${count} товаров</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                    </div>
+                `;
+                return;
+            }
+
+            const subgroups = getSubgroupsForCategory(state.currentCategory);
+
+            if (subgroups.length === 0) {
                 content.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📦</div>
@@ -661,22 +985,35 @@
 
             content.innerHTML = `
                 <div class="brand-grid">
-                    ${Object.entries(brands)
-                        .sort((a, b) => b[1] - a[1])
-                        .map(([brand, count]) => `
-                            <div class="brand-card" onclick="selectBrand('${brand}')">
-                                <div class="brand-icon">${brand.charAt(0)}</div>
-                                <div class="brand-name">${brand}</div>
-                                <div class="brand-count">${count} товаров</div>
-                            </div>
-                        `).join('')}
+                    ${subgroups.map(g => `
+                        <div class="brand-card" onclick="selectSubgroup('${g.name}', '${g.type}')">
+                            <div class="brand-image-bg" style="background-image: url('${g.image}')"></div>
+                            <div class="brand-icon">${g.name.charAt(0)}</div>
+                            <div class="brand-name">${g.name}</div>
+                            <div class="brand-count">${g.count} товаров</div>
+                        </div>
+                    `).join('')}
                 </div>
             `;
         }
 
-        // Select brand
-        function selectBrand(brand) {
-            state.currentBrand = brand;
+        function selectQuickBrand(brand) {
+            state.currentCategory = products.find(p => p.brand === brand)?.category || "Полотна";
+            state.currentSubgroup = { name: brand, type: 'brand' };
+            showProducts();
+            updateBreadcrumbs();
+
+            // Подсвечиваем категорию в сайдбаре
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('.category-name').textContent === state.currentCategory) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function selectSubgroup(name, type) {
+            state.currentSubgroup = { name, type };
             showProducts();
             updateBreadcrumbs();
         }
@@ -689,8 +1026,29 @@
                 filtered = filtered.filter(p => p.category === state.currentCategory);
             }
 
-            if (state.currentBrand) {
-                filtered = filtered.filter(p => p.brand === state.currentBrand);
+            if (state.currentSubgroup) {
+                const sub = state.currentSubgroup;
+                if (sub.type === 'brand') {
+                    filtered = filtered.filter(p => p.brand === sub.name);
+                } else if (sub.type === 'subcat') {
+                    // Фильтруем по типу товара (подкатегории)
+                    filtered = filtered.filter(p => {
+                        const nameLower = p.name.toLowerCase();
+                        if (sub.name === "Платформы под светильники") return nameLower.includes("платформа");
+                        if (sub.name === "Термокольца") return nameLower.includes("кольцо") || nameLower.includes("термокольцо");
+                        if (sub.name === "Обходы труб") return nameLower.includes("обход");
+                        if (sub.name === "Вентиляция") return nameLower.includes("решетка") || nameLower.includes("диффузор");
+                        if (sub.name === "Клей и герметики") return nameLower.includes("клей") || nameLower.includes("cosmofen");
+                        if (sub.name === "Ленты и скотч") return nameLower.includes("скотч") || nameLower.includes("лента");
+                        if (sub.name === "Демпферные шнуры") return nameLower.includes("шнур");
+                        if (sub.name === "Гарпун") return nameLower.includes("гарпун");
+                        if (sub.name === "Саморезы") return nameLower.includes("саморез");
+                        if (sub.name === "Дюбели") return nameLower.includes("дюбель");
+                        if (sub.name === "Анкеры") return nameLower.includes("анкер");
+                        if (sub.name === "Вставки декоративные") return nameLower.includes("вставка") || nameLower.includes("заглушка");
+                        return true; // fallback
+                    });
+                }
             }
 
             const content = document.getElementById('contentArea');
@@ -711,7 +1069,7 @@
                     ${filtered.map(p => `
                         <div class="product-card">
                             <div class="product-image">
-                                ${p.image ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">` : '📦'}
+                                ${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&amp;fit=crop&amp;w=300&amp;q=80'">` : '📦'}
                             </div>
                             <div class="product-info">
                                 <div class="product-header">
@@ -725,10 +1083,10 @@
                                 </div>
                                 <div class="product-prices">
                                     <div class="price-main">${p.price_cut} ₽/м²</div>
-                                    ${p.price_harpoon ? `<div class="price-harpoon">гарпун: ${p.price_harpoon} ₽</div>` : ''}
+                                    ${p.price_harpoon && p.price_harpoon !== '—' ? `<div class="price-harpoon">гарпун: ${p.price_harpoon} ₽</div>` : ''}
                                 </div>
                                 <div class="product-actions">
-                                    <button class="btn-add" onclick="addToCart(${p.id})">+ В смету</button>
+                                    <button class="btn-add" onclick="addToCart(${p.id})">🛒 В смету</button>
                                     ${p.link ? `<a href="${p.link}" target="_blank" class="btn-link">↗</a>` : ''}
                                 </div>
                             </div>
@@ -745,10 +1103,10 @@
 
             if (state.currentCategory) {
                 html += '<span class="breadcrumb-separator">→</span>';
-                if (state.currentBrand) {
-                    html += `<span class="breadcrumb-item" onclick="backToBrands()">${state.currentCategory}</span>`;
+                if (state.currentSubgroup) {
+                    html += `<span class="breadcrumb-item" onclick="backToSubgroups()">${state.currentCategory}</span>`;
                     html += '<span class="breadcrumb-separator">→</span>';
-                    html += `<span class="breadcrumb-current">${state.currentBrand}</span>`;
+                    html += `<span class="breadcrumb-current">${state.currentSubgroup.name}</span>`;
                 } else {
                     html += `<span class="breadcrumb-current">${state.currentCategory}</span>`;
                 }
@@ -760,20 +1118,28 @@
         // Reset navigation
         function resetNavigation() {
             state.currentCategory = null;
-            state.currentBrand = null;
+            state.currentSubgroup = null;
             document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
             showBrands();
             updateBreadcrumbs();
         }
 
-        // Back to brands
-        function backToBrands() {
-            state.currentBrand = null;
+        // Back to subgroups (brands/subcategories)
+        function backToSubgroups() {
+            state.currentSubgroup = null;
             showBrands();
             updateBreadcrumbs();
         }
 
-        // Add to cart
+        // Cart / Estimate functions
+        function toggleCart() {
+            const panel = document.getElementById('estimatePanel');
+            const overlay = document.getElementById('overlay');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+            renderEstimateItems();
+        }
+
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
@@ -781,43 +1147,115 @@
             state.cart.push(product);
             document.getElementById('cartBadge').textContent = state.cart.length;
 
-            // Show notification
+            // Show custom premium notification
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
-                top: 100px;
+                top: 30px;
                 right: 30px;
                 background: linear-gradient(135deg, var(--success), var(--primary));
                 color: white;
                 padding: 15px 25px;
                 border-radius: 12px;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-                z-index: 1000;
-                animation: slideIn 0.3s;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+                z-index: 2000;
+                animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                display: flex;
+                align-items: center;
+                gap: 12px;
             `;
-            notification.textContent = `✓ ${product.name} добавлен в смету`;
+            notification.innerHTML = `
+                <img src="${product.image}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;">
+                <div>
+                    <div style="font-weight:700;font-size:14px;">Добавлено в смету</div>
+                    <div style="font-size:12px;opacity:0.9;">${product.name}</div>
+                </div>
+            `;
             document.body.appendChild(notification);
 
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s';
+                notification.style.animation = 'slideOut 0.3s forwards';
                 setTimeout(() => notification.remove(), 300);
-            }, 2000);
+            }, 2500);
         }
 
-        // Toggle cart
-        function toggleCart() {
-            alert(`В смете: ${state.cart.length} товаров\n\nФункция просмотра сметы будет добавлена в следующей версии.`);
+        function renderEstimateItems() {
+            const container = document.getElementById('estimateItems');
+            if (state.cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding:40px 0;">
+                        <div class="empty-icon" style="font-size:48px;">📝</div>
+                        <div class="empty-title" style="font-size:16px;">Смета пуста</div>
+                        <div class="empty-text" style="font-size:13px;">Добавьте товары из каталога</div>
+                    </div>
+                `;
+                document.getElementById('totalPrice').textContent = '0 ₽';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = state.cart.map((item, index) => {
+                total += item.price_cut;
+                return `
+                    <div class="estimate-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="estimate-item-details">
+                            <div class="estimate-item-title">${item.name}</div>
+                            <div class="estimate-item-price">${item.price_cut.toLocaleString('ru-RU')} ₽/м²</div>
+                        </div>
+                        <button class="btn-remove-item" onclick="removeFromCart(${index})">✕</button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalPrice').textContent = total.toLocaleString('ru-RU') + ' ₽';
         }
 
-        // Search
+        function removeFromCart(index) {
+            state.cart.splice(index, 1);
+            document.getElementById('cartBadge').textContent = state.cart.length;
+            renderEstimateItems();
+        }
+
+        function clearEstimate() {
+            if (confirm("Вы действительно хотите полностью очистить смету?")) {
+                state.cart = [];
+                document.getElementById('cartBadge').textContent = '0';
+                renderEstimateItems();
+            }
+        }
+
+        function exportEstimate() {
+            if (state.cart.length === 0) return alert("Смета пуста!");
+
+            let csv = 'Артикул;Товар;Категория;Бренд;Цена (₽)
+';
+            state.cart.forEach(item => {
+                csv += `${item.code};${item.name};${item.category};${item.brand};${item.price_cut}
+`;
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'b2b_smeta_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Search logic
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
+            const query = e.target.value.toLowerCase().trim();
+            const content = document.getElementById('contentArea');
+
             if (query.length < 2) {
-                if (state.currentBrand) {
+                if (state.currentCategory) {
                     showProducts();
                 } else {
                     showBrands();
                 }
+                updateBreadcrumbs();
                 return;
             }
 
@@ -827,7 +1265,6 @@
                 p.brand.toLowerCase().includes(query)
             );
 
-            const content = document.getElementById('contentArea');
             if (filtered.length === 0) {
                 content.innerHTML = `
                     <div class="empty-state">
@@ -840,11 +1277,12 @@
             }
 
             content.innerHTML = `
+                <div style="margin-bottom:15px; font-size:14px; color:var(--text-secondary);">Результаты поиска для: "${query}"</div>
                 <div class="product-grid">
-                    ${filtered.slice(0, 50).map(p => `
+                    ${filtered.slice(0, 80).map(p => `
                         <div class="product-card">
                             <div class="product-image">
-                                ${p.image ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">` : '📦'}
+                                ${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&amp;fit=crop&amp;w=300&amp;q=80'">` : '📦'}
                             </div>
                             <div class="product-info">
                                 <div class="product-header">
@@ -857,27 +1295,30 @@
                                 </div>
                                 <div class="product-prices">
                                     <div class="price-main">${p.price_cut} ₽/м²</div>
+                                    ${p.price_harpoon && p.price_harpoon !== '—' ? `<div class="price-harpoon">гарпун: ${p.price_harpoon} ₽</div>` : ''}
                                 </div>
                                 <div class="product-actions">
-                                    <button class="btn-add" onclick="addToCart(${p.id})">+ В смету</button>
+                                    <button class="btn-add" onclick="addToCart(${p.id})">🛒 В смету</button>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
             `;
+
+            document.getElementById('breadcrumbs').innerHTML = '<span class="breadcrumb-item" onclick="resetNavigation()">Все категории</span><span class="breadcrumb-separator">→</span><span class="breadcrumb-current">Поиск</span>';
         });
 
-        // Animations
+        // Animations styles
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
+                from { transform: translateY(50px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
             }
             @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
+                from { transform: translateY(0); opacity: 1; }
+                to { transform: translateY(50px); opacity: 0; }
             }
         `;
         document.head.appendChild(style);
